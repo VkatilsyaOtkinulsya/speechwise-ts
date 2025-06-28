@@ -1,16 +1,13 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import AppLayout from './components/layout/MainLayout';
+import { ConfigProvider } from 'antd';
+import ruRU from 'antd/locale/ru_RU';
+import { Outlet } from 'react-router-dom';
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<AppLayout />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <ConfigProvider locale={ruRU}>
+      <Outlet />
+    </ConfigProvider>
   );
 }
 
