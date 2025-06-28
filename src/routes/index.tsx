@@ -3,8 +3,10 @@ import App from '../App';
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 
-import MainLayout from '../components/layout/MainLayout';
-import AdminLayout from '../components/layout/AdminLayout';
+import MainLayout from '../components/layout/main/MainLayout';
+import AdminLayout from '../components/layout/admin/AdminLayout';
+import Meetings from '../components/features/Meetigns/Meetings';
+import Projects from '../components/features/Projects/Projects';
 
 const routes: RouteObject[] = [
   {
@@ -13,24 +15,37 @@ const routes: RouteObject[] = [
     children: [
       // Public routes
       {
-        path: 'login',
+        path: '/login',
         element: <LoginPage />
       },
       {
-        path: 'register',
+        path: '/register',
         element: <RegisterPage />
       },
 
       // Main layout routes
       {
-        path: '',
+        path: '/main/*',
         element: <MainLayout />,
-        children: []
+        children: [
+          {
+            index: true,
+            element: <Meetings />
+          },
+          {
+            path: 'meetings',
+            element: <Meetings />
+          },
+          {
+            path: 'projects',
+            element: <Projects />
+          }
+        ]
       },
 
       // Admin layout routes
       {
-        path: 'admin',
+        path: '/admin',
         element: <AdminLayout />,
         children: []
       }
