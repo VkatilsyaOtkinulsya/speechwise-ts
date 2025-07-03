@@ -1,54 +1,67 @@
-import { createBrowserRouter, type RouteObject } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import type { useRouteObject } from '../utils/lib/useRouteObject';
+import { lazy } from 'react';
 import App from '../App';
-import LoginPage from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
+import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
 
-import MainLayout from '../components/layout/main/MainLayout';
-import AdminLayout from '../components/layout/admin/AdminLayout';
-import Meetings from '../components/features/Meetigns/Meetings';
-import Projects from '../components/features/Projects/Projects';
+const LoginPage = lazy(() => import('../pages/LoginPage/LoginPage'));
+const Meetings = lazy(() => import('../components/features/Meetings/Meetings'));
+const Projects = lazy(() => import('../components/features/Projects/Projects'));
+const Users = lazy(() => import('../components/features/Users/Users'));
+const ErrorPage = lazy(() => import('../pages/ErrorPage/ErrorPage'));
 
-const routes: RouteObject[] = [
+// const ProjectDetails = lazy(
+//   () => import('../components/features/Projects/ProjectDetails')
+// );
+// const MeetingDetails = lazy(() => import('../components/features/Meetings/MeetingDetails'));
+
+const routes: useRouteObject[] = [
   {
     path: '/',
     element: <App />,
     children: [
-      // Public routes
       {
-        path: '/login',
-        element: <LoginPage />
+        path: 'login',
+        element: (
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        )
       },
       {
-        path: '/register',
-        element: <RegisterPage />
-      },
-
-      // Main layout routes
-      {
-        path: '/main/*',
-        element: <MainLayout />,
+        path: '',
+        element: <ProtectedRoute />,
         children: [
           {
-            index: true,
-            element: <Meetings />
-          },
-          {
-            path: 'meetings',
-            element: <Meetings />
+            path: '',
+            element: <Navigate to="projects" replace />
           },
           {
             path: 'projects',
-            element: <Projects />
+            element: <Outlet />,
+            children: [
+              { index: true, element: <Projects /> }
+              // { path: ':id', element: <ProjectDetail /> }
+            ]
+          },
+          {
+            path: 'meetings',
+            element: <Outlet />,
+            children: [
+              { index: true, element: <Meetings /> }
+              // { path: ':id', element: <MeetingDetail /> }
+            ]
+          },
+          {
+            path: 'users',
+            element: <Users />,
+            meta: { roles: ['admin'] }
           }
         ]
       },
 
-      // Admin layout routes
-      {
-        path: '/admin',
-        element: <AdminLayout />,
-        children: []
-      }
+      { path: '*', element: <ErrorPage /> }
     ]
   }
 ];

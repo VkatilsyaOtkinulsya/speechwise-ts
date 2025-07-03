@@ -1,0 +1,34 @@
+.dropzone {
+  border: 2px dashed #d9d9d9;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  color: #595959;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropzone svg {
+  font-size: 24px;
+  color: #8c8c8c;
+  transition: color 0.2s;
+}
+
+.dropzone p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.dropzone.overed {
+  border-color: #1677ff;
+  background-color: #e6f4ff;
+}
+
+.dropzone.overed svg {
+  color: #1677ff;
+}

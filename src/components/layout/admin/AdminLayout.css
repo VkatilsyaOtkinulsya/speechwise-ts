@@ -1,0 +1,43 @@
+.sider-logo {
+  display: flex;
+  height: 32px;
+  margin: 16px;
+}
+
+.sider-logo-text {
+  font-size: 20px;
+  pointer-events: none;
+}
+
+.sider-menu {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+}
+
+.sider-menu ul {
+  display: block;
+  flex: 1;
+}
+
+.logout-button {
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  padding: 0 16px;
+  margin: 0 4px 16px 4px;
+  margin-top: auto;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.logout-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
