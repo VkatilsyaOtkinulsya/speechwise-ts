@@ -55,8 +55,7 @@ const Meetings = () => {
   const [editingMeeting, setEditingMeeting] = useState<Meeting | null>(null);
   const [form] = Form.useForm();
 
-  const { meetings, isLoading } = useMeetings();
-  console.log(meetings);
+  const { meetings, refetch, isLoading } = useMeetings();
 
   const openModal = useMediaModalState((state) => state.open);
 
@@ -65,6 +64,7 @@ const Meetings = () => {
   };
 
   useEffect(() => {
+    refetch();
     const projectsData: Project[] = [
       {
         id: 1,

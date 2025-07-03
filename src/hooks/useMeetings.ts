@@ -8,7 +8,7 @@ export function useMeetings() {
     queryKey: ['meetings'],
     queryFn: getMeetings,
     enabled: useAuthStore.getState().isAuthorized('user'),
-    staleTime: 60 * 1000
+    staleTime: 60 * 5000
   });
 
   return {
