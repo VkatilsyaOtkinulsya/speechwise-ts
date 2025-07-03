@@ -1,4 +1,4 @@
-import { getMeetings } from '@/api/postMeeting';
+import { getMeetings } from '@/api/getMeetings';
 import type { Meeting } from '@/types/meeting.type';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
@@ -8,7 +8,7 @@ export function useMeetings() {
     queryKey: ['meetings'],
     queryFn: getMeetings,
     enabled: useAuthStore.getState().isAuthorized('user'),
-    staleTime: 60 * 5000
+    staleTime: 60 * 1000
   });
 
   return {
