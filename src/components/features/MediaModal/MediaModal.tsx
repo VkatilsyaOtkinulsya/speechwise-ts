@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import DropZone from './DropZone/DropZone';
 import LinkInput from './LinkInput';
 import FilePreview from './FilePreview';
-import { useCreateMeeting } from '@/hooks/useCreateMeeting';
+import { useCreateMeeting } from '@/hooks/useMeetings';
 
 const MediaModal: React.FC = () => {
   const {
@@ -55,9 +55,10 @@ const MediaModal: React.FC = () => {
     const payload = {
       title,
       description,
-      projectId: '',
+      projectId: undefined,
       file: file || undefined,
-      url: url || undefined
+      url: url || undefined,
+      duration: ''
     };
 
     createMeeting(payload);

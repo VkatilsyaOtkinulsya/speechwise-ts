@@ -18,7 +18,11 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 import './Meetings.css';
-import { useMeetings } from '@/hooks/useMeetings';
+import { useDeleteMeeting, useMeetings } from '@/hooks/useMeetings';
+import type { Meeting } from '@/types/meeting.type';
+import { useMeetingsFilterStore } from '@/stores/meetingsFilterStore';
+import { useShallow } from 'zustand/shallow';
+import type { Project } from '@/types/project.types';
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -26,37 +30,40 @@ dayjs.extend(isSameOrBefore);
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
-interface Meeting {
-  id: number;
-  date: string;
-  title: string;
-  status: string;
-  duration: string;
-  projectId: number | null;
-}
-
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  technologies: string[];
-  status: string;
-}
-
 const Meetings = () => {
-  // const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [filter, setFilter] = useState<string>('');
-  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([
-    null,
-    null
-  ]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingMeeting, setEditingMeeting] = useState<Meeting | null>(null);
   const [form] = Form.useForm();
 
   const { meetings, refetch, isLoading } = useMeetings();
+  const {
+    filter,
+    setFilter,
+    setDateRange,
+    getProjectTitle,
+    filterAndSortMeetings
+  } = useMeetingsFilterStore(
+    useShallow(
+      ({
+        filter,
+        dateRange,
+        setFilter,
+        setDateRange,
+        getProjectTitle,
+        filterAndSortMeetings
+      }) => ({
+        filter,
+        dateRange,
+        setFilter,
+        setDateRange,
+        getProjectTitle,
+        filterAndSortMeetings
+      })
+    )
+  );
 
+  const deleteMeeting = useDeleteMeeting();
   const openModal = useMediaModalState((state) => state.open);
 
   const handleAddMeetingClick = () => {
@@ -77,15 +84,8 @@ const Meetings = () => {
     setProjects(projectsData);
   }, []);
 
-  const getProjectTitle = (projectId: number | null) => {
-    if (projectId === null) return 'Нет проекта';
-    const project = projects.find((p) => p.id === projectId);
-    return project ? project.title : 'Неизвестный проект';
-  };
-
   const handleDelete = (id: number) => {
-    // setMeetings(meetings.filter((meeting) => meeting.id !== id));
-    message.success('Встреча удалена');
+    deleteMeeting.mutate(id);
   };
 
   const handleEdit = (meeting: Meeting) => {
@@ -126,28 +126,6 @@ const Meetings = () => {
     form.resetFields();
   };
 
-  const filteredMeetings = meetings.filter((meeting) => {
-    const projectTitle = getProjectTitle(meeting.projectId).toLowerCase();
-    const matchProject = projectTitle.includes(filter.toLowerCase());
-
-    const meetingDate = dayjs(meeting.date, 'DD.MM.YYYY');
-    const [start, end] = dateRange;
-
-    const matchDate =
-      !start ||
-      !end ||
-      (meetingDate.isSameOrAfter(start, 'day') &&
-        meetingDate.isSameOrBefore(end, 'day'));
-
-    return matchProject && matchDate;
-  });
-
-  const sortedMeetings = [...filteredMeetings].sort((a, b) => {
-    const dateA = dayjs(a.date, 'DD.MM.YYYY');
-    const dateB = dayjs(b.date, 'DD.MM.YYYY');
-    return dateB.valueOf() - dateA.valueOf();
-  });
-
   const columns = [
     { title: 'Дата', dataIndex: 'date', key: 'date' },
     { title: 'Название', dataIndex: 'title', key: 'title' },
@@ -157,7 +135,8 @@ const Meetings = () => {
       title: 'Проект',
       dataIndex: 'projectId',
       key: 'projectId',
-      render: (projectId: number | null) => getProjectTitle(projectId)
+      render: (projectId: number | undefined) =>
+        getProjectTitle(projectId, projects)
     },
     {
       title: 'Действия',
@@ -181,7 +160,10 @@ const Meetings = () => {
     }
   ];
 
-  const dataSource = meetings.map((meeting) => ({
+  const sortedMeetings =
+    meetings && projects ? filterAndSortMeetings(meetings, projects) : [];
+
+  const dataSource = sortedMeetings.map((meeting) => ({
     ...meeting,
     key: meeting.id
   }));
@@ -191,7 +173,6 @@ const Meetings = () => {
       {isLoading && <Spin size="large" />}
       {!isLoading && (
         <>
-          {' '}
           <div
             className="filter-container"
             style={{
