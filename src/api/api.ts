@@ -5,7 +5,7 @@ import { handleApiError } from '../utils/error-handler';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: `${BASE_URL}`,
   headers: {
     'Content-Type': 'application/json'
   }
